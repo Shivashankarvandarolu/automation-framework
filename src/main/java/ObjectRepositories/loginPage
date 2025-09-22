@@ -1,0 +1,39 @@
+
+public void loginPage(){
+
+
+    private WebDriver driver ;
+    private Utils utils ;
+
+    public loginPage(){
+        PageFactory.initElements(driver, this);
+        this.driver = new WebDriver();
+        this.utils = new Utils(driver);
+    }
+
+    @FindBy(xpath="//*[@id='userName']")
+    private WebElement usernameField;
+
+    public WebElement getUsernameField() {
+        utils.isDisplayed(usernameField);
+        return usernameField;
+    }   
+
+    @FindBy(xpath="//input[@id='password']")
+    private WebElement passwordField;
+
+    public WebElement getPasswordField() {
+        utils.isDisplayed(passwordField);
+        return passwordField;
+    }       
+
+    @FindBy(xpath="//button[@id='login']")
+    private WebElement loginButton;
+
+    public WebElement getLoginButton_click() {
+        utils.checkElementPresenceAndClickable(loginButton);
+        return loginButton;
+    }
+
+    
+}
