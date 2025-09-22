@@ -2,9 +2,9 @@ package main.java;
 
 public class BaseTest {
 
-    WebDriver driver;
+protected WebDriver driver;
 
-    @Before
+    @test
     public void setup() {
         System.out.println("BaseTest setup");
         driver = new ChromeDriver();
@@ -15,7 +15,7 @@ public class BaseTest {
         driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
     }
 
-    @After
+    @test
     public void teardown() {
         System.out.println("BaseTest teardown");
         if (driver != null) {
@@ -23,3 +23,4 @@ public class BaseTest {
         }
     }
 }
+
