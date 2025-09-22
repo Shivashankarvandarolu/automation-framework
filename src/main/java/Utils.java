@@ -9,33 +9,27 @@ public class Utils {
     }
 
     public boolean isDisplayed(WebElement element){
-        driver.findElement(element).isDisplayed();
-        return true;
+        return element.isDisplayed();
     }
 
     public boolean isEnabled(WebElement element){
-        driver.findElement(element).isEnabled();
-        return true;
+        return element.isEnabled();
     }
 
     public boolean isSelected(WebElement element){
-        driver.findElement(element).isSelected();
-        return true;
+        return element.isSelected();
     }
 
     public String getTitle(){
-        String title = driver.getTitle();
-        return title;
+        return driver.getTitle();
     }
 
     public String getCurrentUrl(){
-        String currentUrl = driver.getCurrentUrl();
-        return currentUrl;
+        return driver.getCurrentUrl();
     }
 
     public String getPageSource(){
-        String pageSource = driver.getPageSource();
-        return pageSource;
+        return driver.getPageSource();
     }
 
     public void navigateToUrl(String url){
@@ -105,9 +99,9 @@ public class Utils {
         }
     }
 
-    public void setExplicitWait(WebElement element){
+    public void setExplicitWait(By locator){
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("elementId")));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
     }
 
     public void setImplicitWait(){
@@ -130,7 +124,7 @@ public class Utils {
         driver.manage().addCookie(cookie);
     }
 
-    public void selectValueFromDropdownByValue(WebElement element, String value){
+    public void selectValueFromDropdown(WebElement element, String value){
         Select select = new Select(element);
         select.selectByValue(value);
     }
@@ -167,8 +161,7 @@ public class Utils {
 
     public List<WebElement> getAllOptionsFromDropdown(WebElement element){
         Select select = new Select(element);
-        List<WebElement> options = select.getOptions();
-        return options;
+        return select.getOptions();
     }
 
     public void hoverOverElement(WebElement element){
@@ -191,6 +184,7 @@ public class Utils {
         actions.contextClick(element).perform();
     }
 
+    // Consolidated scroll methods
     public void scrollToElement(WebElement element){
         JavascriptExecutor js = (JavascriptExecutor) driver;
         js.executeScript("arguments[0].scrollIntoView(true);", element);
@@ -201,11 +195,22 @@ public class Utils {
         js.executeScript("window.scrollBy(arguments[0], arguments[1]);", x, y);
     }
 
+    public void scrollToBottom(){
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("window.scrollTo(0, document.body.scrollHeight);");
+    }
+
+    public void scrollToTop(){
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("window.scrollTo(0, 0);");
+    }
+
     public void executeJavaScript(String script){
         JavascriptExecutor js = (JavascriptExecutor) driver;
         js.executeScript(script);
     }
 
+    // Consolidated JS click method
     public void clickUsingJavaScript(WebElement element){
         JavascriptExecutor js = (JavascriptExecutor) driver;
         js.executeScript("arguments[0].click();", element);
@@ -231,6 +236,7 @@ public class Utils {
         js.executeScript("arguments[0].style.border=''", element);
     }
 
+    // Wait methods
     public void waitForElementToBeClickable(WebElement element){
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         wait.until(ExpectedConditions.elementToBeClickable(element));
@@ -269,16 +275,14 @@ public class Utils {
     public void clearCookiesAndCache(){
         driver.manage().deleteAllCookies();
         // Note: Clearing cache programmatically is not directly supported in Selenium WebDriver.
-        // This can be achieved using browser-specific options or extensions.
     }
 
-    public void widnwoHandleExample(){
+    public void windowHandleExample(){
         String mainWindow = driver.getWindowHandle();
         Set<String> allWindows = driver.getWindowHandles();
         for (String window : allWindows) {
             if (!window.equals(mainWindow)) {
                 driver.switchTo().window(window);
-                // Perform actions on the new window
                 driver.close();
             }
         }
@@ -287,7 +291,6 @@ public class Utils {
 
     public void iframeExample(WebElement iframeElement){
         driver.switchTo().frame(iframeElement);
-        // Perform actions inside the iframe
         driver.switchTo().defaultContent();
     }   
 
@@ -302,13 +305,11 @@ public class Utils {
 
     public void handleMultipleTabsExample(){
         String originalTab = driver.getWindowHandle();
-        // Open a new tab using JavaScript
         ((JavascriptExecutor) driver).executeScript("window.open()");
         Set<String> allTabs = driver.getWindowHandles();
         for (String tab : allTabs) {
             if (!tab.equals(originalTab)) {
                 driver.switchTo().window(tab);
-                // Perform actions on the new tab
                 driver.close();
             }
         }
@@ -328,9 +329,100 @@ public class Utils {
         wait.until(ExpectedConditions.visibilityOf(element));
     }
 
-    public void jsClickExample(WebElement element){
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript("arguments[0].click();", element);
+    // Consolidated element presence and interaction methods
+    public void checkElementPresenceAndEnterData(WebElement element, String data){
+        if(isDisplayed(element) && isEnabled(element)){
+            element.clear();
+            element.sendKeys(data);
+            System.out.println("Data entered successfully");
+        } else {
+            System.out.println("Element is not interactable");
+        }
     }
 
+    public void checkElementPresenceAndClick(WebElement element){
+        if(isDisplayed(element) && isEnabled(element)){
+            element.click();
+            System.out.println("Element clicked successfully");
+        } else {
+            System.out.println("Element is not clickable");
+        }
+    }   
+
+    public void checkElementPresenceAndGetText(WebElement element){
+        if(isDisplayed(element)){
+            String text = element.getText();
+            System.out.println("Element text: " + text);
+        } else {
+            System.out.println("Element is not visible");
+        }
+    }   
+
+    public void checkElementPresenceAndGetAttribute(WebElement element, String attribute){
+        if(isDisplayed(element)){
+            String attrValue = element.getAttribute(attribute);
+            System.out.println("Element attribute value: " + attrValue);
+        } else {
+            System.out.println("Element is not visible");
+        }
+    }
+
+    public void handleStaleElementReference(WebElement element){
+        int attempts = 0;
+        while(attempts < 2) {
+            try {
+                element.click();
+                break;
+            } catch(StaleElementReferenceException e) {
+                System.out.println("StaleElementReferenceException caught, retrying...");
+                attempts++;
+            }
+        }
+    }   
+
+    public void waitForElementWithCustomTimeout(WebElement element, int timeoutInSeconds){
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds));
+        wait.until(ExpectedConditions.visibilityOf(element));
+    }
+
+    public void waitForElementWithCustomPolling(WebElement element, int timeoutInSeconds, int pollingInSeconds){
+        Wait<WebDriver> wait = new FluentWait<WebDriver>(driver)
+                .withTimeout(Duration.ofSeconds(timeoutInSeconds))
+                .pollingEvery(Duration.ofSeconds(pollingInSeconds))
+                .ignoring(NoSuchElementException.class);
+        wait.until(ExpectedConditions.visibilityOf(element));
+    }
+
+    public void waitForElementToBeClickableWithCustomTimeout(WebElement element, int timeoutInSeconds){
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds));
+        wait.until(ExpectedConditions.elementToBeClickable(element));
+    }
+
+    public void waitForElementToBeVisibleWithCustomTimeout(WebElement element, int timeoutInSeconds){
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds));
+        wait.until(ExpectedConditions.visibilityOf(element));
+    }
+
+    // Consolidated scroll and interact methods
+    public void scrollToElementAndClick(WebElement element){
+        scrollToElement(element);
+        element.click();
+    }
+
+    public void scrollToElementAndSendKeys(WebElement element, String text){
+        scrollToElement(element);
+        element.sendKeys(text);
+    }
+
+    public void scrollToElementAndGetText(WebElement element){
+        scrollToElement(element);
+        String text = element.getText();
+        System.out.println("Element text: " + text);
+    }
+
+    public void scrollToElementAndGetAttribute(WebElement element, String attribute){
+        scrollToElement(element);
+        String attrValue = element.getAttribute(attribute);
+        System.out.println("Element attribute value: " + attrValue);
+    }
 }
