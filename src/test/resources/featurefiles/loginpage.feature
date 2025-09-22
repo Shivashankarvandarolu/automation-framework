@@ -3,7 +3,7 @@ Feature: Login Page
 
 Background:
     Given the browser is open
-    And the user navigates to the login page URL 'https://google.com'
+    And the user navigates to the login page URL 'https://https://demoqa.com/'
 
     Scenario: Login with empty fields
         Given the user is on the login page
